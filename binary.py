@@ -5,8 +5,8 @@ import time
 from datetime import timedelta
 
 start_time = time.monotonic()
-input_file = "words for problem.txt"
-#input_file = "words_test.txt"
+#input_file = "words for problem.txt"
+input_file = "words_test.txt"
 
 with open(input_file) as cache:
     lines = [line.rstrip('\n') for line in cache]
@@ -37,18 +37,18 @@ def find_cat_str_binary(lines):
                         # outfile.write("\nitem3:"+item3)
                         # outfile.write("\nitem3:"+item3+"compare_str:"+item2[len(item1):len(item3)+len(item1)])
                         if item2.startswith(item3, len(item1), len(item3) + len(item1)):
-                            outfile.write("\n" + item2)
+                            #outfile.write("\n" + item2)
                             # if item2[len(item1):len(item3)+len(item1)] == item3:
                             database.append(item2)
                             break
 
 
                 else:
-                    print("item1 in database:", item1)
+                    #print("item1 in database:", item1)
                     # outfile.write("\nitem2: "+item2 + " item1: "+item1)
                     continue
             else:
-                print("item2 in database:", item2)
+                #print("item2 in database:", item2)
                 continue
         idx += 1
 
@@ -103,19 +103,19 @@ def find_cat_strings(lines):
     #print("\n", database)
     return database
 
-'''
+
 start_time_bin = time.monotonic()
 strings = find_cat_str_binary(lines)
 exec_time_bin = timedelta(seconds=time.monotonic() - start_time_bin)
-print("Total execution time for find_cat_strings: %s", exec_time_bin)
+print("Total execution time for find_cat_str_binary: %s", exec_time_bin)
 strings.sort(key=len, reverse=True)
 print("Longest concatenated word:", strings[0])
 print("2nd Longest concatenated word:", strings[1])
-print("Total count of all concatenated words:", len(strings))
+print("Total count of all concatenated words using binary:", len(strings))
 
 # outfile = open('outfile.txt', 'w')
 # outfile.write("binary_search_implementation")
-'''
+
 start_time_non_bin = time.monotonic()
 strings = find_cat_strings(lines)
 exec_time_non_bin = timedelta(seconds=time.monotonic() - start_time_non_bin)
@@ -123,8 +123,7 @@ print("Total execution time for find_cat_strings: %s", exec_time_non_bin)
 strings.sort(key=len, reverse=True)
 print("Longest concatenated word:", strings[0])
 print("2nd Longest concatenated word:", strings[1])
-print("Total count of all concatenated words:", len(strings))
-'''
-print("Performance benchmark: binary search is ", ((exec_time_non_bin - exec_time_bin) / exec_time_bin) * 100,
-      "% faster than non binary search")
-'''
+print("Total count of all concatenated words using non binary:", len(strings))
+
+print("Performance benchmark: find_cat_str_binary is", ((exec_time_non_bin - exec_time_bin) / exec_time_bin) * 100,
+      "% faster than find_cat_strings")
