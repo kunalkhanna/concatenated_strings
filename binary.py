@@ -1,4 +1,5 @@
 import bisect
+from bisect import bisect_left
 from itertools import islice
 import sys
 import time
@@ -11,6 +12,13 @@ input_file = "words for problem.txt"
 with open(input_file) as cache:
     lines = [line.rstrip('\n') for line in cache]
 print("Time to read file and store in list: %s", timedelta(seconds=time.monotonic() - start_time))
+
+
+def word_exists(wordlist, word_fragment):
+    try:
+        return wordlist[bisect_left(wordlist, word_fragment)].startswith(word_fragment)
+    except IndexError:
+        return False  # word_fragment is greater than all entries in wordlist
 
 
 def find_cat_str_binary(lines):
@@ -62,6 +70,8 @@ def find_cat_strings(lines):
     outfile = open('outfile_find_cat_strings.txt', 'w')
     index = 0
     database = list()
+    possible_words = list(items for items in lines if lines.count(items) > 1)
+    print("possible words:", len(possible_words), "list:", possible_words)
     for item1 in lines:
         if database.count(item1) > 0:
             continue
@@ -72,6 +82,7 @@ def find_cat_strings(lines):
             sys.stdout.write("\r[--%d%%--]" % (((index + 1) / len(lines)) * 100))  # Progress Bar
             sys.stdout.flush()
             # print("item1:", item1,"index:" ,index, "len_of_lines", len(lines))
+            word_exists(lines, item1)
             matching = [items for items in lines if items.startswith(item1, 0, len(item1))]
             # print("matching:", matching)
             for item2 in matching:
@@ -115,9 +126,27 @@ def find_cat_strings(lines):
     # print("\n", database)
     return database
 
+
+def find_cat_strings2(lines):
+    outfile = open('outfile_find_cat_strings.txt', 'w')
+    index = 0
+    database = list()
+    for item1 in [items for items in lines if database.count(items) == 0 and len(items) > 0]:
+        sys.stdout.write("\r[--%d%%--]" % (((index + 1) / len(lines)) * 100))  # Progress Bar
+        sys.stdout.flush()
+        for item2 in [items for items in lines if items.startswith(item1, 0, len(item1)) and items is not item1 and len(items) !=0 and database.count(items) == 0]:
+            if len([items for items in lines if item2.startswith(items, len(item1), len(items)+len(item1)) and len(items) !=0]) > 0:
+                database.append(item2)
+        index += 1
+    #database = list(set(database))
+    outfile.close()
+    print("\n", database)
+    return database
+
+
 '''
 start_time_bin = time.monotonic()
-strings = find_cat_str_binary(lines)
+strings = find_cat_strings(lines)
 exec_time_bin = timedelta(seconds=time.monotonic() - start_time_bin)
 print("Total execution time for find_cat_strings: %s", exec_time_bin)
 strings.sort(key=len, reverse=True)
@@ -129,7 +158,7 @@ print("Total count of all concatenated words:", len(strings))
 # outfile.write("binary_search_implementation")
 '''
 start_time_non_bin = time.monotonic()
-strings = find_cat_strings(lines)
+strings = find_cat_strings2(lines)
 exec_time_non_bin = timedelta(seconds=time.monotonic() - start_time_non_bin)
 print("Total execution time for find_cat_strings: %s", exec_time_non_bin)
 strings.sort(key=len, reverse=True)
@@ -138,6 +167,7 @@ print("2nd Longest concatenated word:", strings[1])
 print("Total count of all concatenated words:", len(strings))
 
 '''
-print("Performance benchmark: binary search is ", ((exec_time_non_bin - exec_time_bin) / exec_time_bin) * 100,
-      "% faster than non binary search")
+print("Performance benchmark: find_cat_str2 search is ", ((exec_time_non_bin - exec_time_bin) / exec_time_bin) * 100,
+      "% faster than find_cat_str")
+
 '''
